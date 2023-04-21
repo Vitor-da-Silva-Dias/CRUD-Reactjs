@@ -1,17 +1,21 @@
 import { ListItem, IconButton, ListItemAvatar, Avatar, ListItemText, Divider, Grid, Typography, TextField, Button} from "@mui/material";
+import LogoutIcon from '@mui/icons-material/Logout';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import React, {useMemo, useState} from "react";
 import Recado from "../types/Recado";
-import DialogConfirm from "../components/DialogConfirm";
+import DialogConfirm from "./DialogConfirm";
 
-const Recados: React.FC = () => {
+
+const List: React.FC = () => {
+    
 
     const [list, setList] = useState<Recado[]>([]);
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>(''); 
     const [open, setOpen] = useState<boolean>(false);
     const [idRemove, setIdRemove] = useState<number | undefined>();
+    
 
     const listaProdutos = useMemo(() => {
         return list.map(item => {
@@ -73,10 +77,17 @@ const Recados: React.FC = () => {
         const newTitle: any = prompt('edit titulo');
         const newDescription: any = prompt('edit Preço');
         const newList = [...list];
-    
-        newList[index].title = newTitle;
-        newList[index].description = newDescription;
-    
+        
+        if(newTitle === '' || newDescription === ''){
+          alert("Não se pode deixar campos em branco! Favor preencher corretamente.")
+          return list;
+        }
+
+        if(newTitle != null || newDescription != null){
+          newList[index].title = newTitle;
+          newList[index].description = newDescription;
+        }
+        
         setList(newList);
       };
     
@@ -93,11 +104,13 @@ const Recados: React.FC = () => {
     
       return (
         <Grid container spacing={4}>
-          <Grid item xs={12}>
-            <Typography variant="h3">Produtos</Typography>
-            <Divider />
+          <Grid item xs={11}>
+            <Typography variant="h3">Recados</Typography>
           </Grid>
-    
+          <Grid item xs={1}>
+            <LogoutIcon/>
+          </Grid>
+          <Divider/>
           <Grid item xs={5}>
             <TextField fullWidth value={title} label="Título" onChange={e => handleChange(e)} />
           </Grid>
@@ -105,7 +118,7 @@ const Recados: React.FC = () => {
             <TextField
               fullWidth
               value={description}
-              label="Valor do produto"
+              label="Descrição"
               onChange={e => handleChangeDescription(e)}
             />
           </Grid>
@@ -130,5 +143,5 @@ const Recados: React.FC = () => {
       );
     };
     
-    export default Recados;
+    export default List;
     

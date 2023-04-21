@@ -1,5 +1,6 @@
 import { Box, Button, Modal, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 
 const Login: React.FC = () => {
@@ -8,7 +9,8 @@ const Login: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
+  
+  
   const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -24,8 +26,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(`Username: ${username}, Password: ${password}`);
-    // Lógica de autenticação aqui
+    
   };
 
   return (
@@ -38,7 +39,9 @@ const Login: React.FC = () => {
         <br/><br/>
           <TextField fullWidth placeholder='password' type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
         <br/><br/>
+        <Link to = "/recados" style={{textDecoration:'none'}}>
         <Button variant='contained' fullWidth type="submit">Entrar</Button>
+        </Link>
         <br/><br/>
         <Button variant='contained' color='success' fullWidth onClick={handleOpen}>Criar conta</Button>
       </form>
