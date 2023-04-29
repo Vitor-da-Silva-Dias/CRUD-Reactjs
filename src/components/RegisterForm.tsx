@@ -39,7 +39,7 @@ const RegisterForm: React.FC = () => {
       return;
     }
 
-    const newUser: User = {
+    const newUser: UserProps = {
       email,
       password,
       errands: [],
@@ -54,7 +54,7 @@ const RegisterForm: React.FC = () => {
     navigate ('/');
   };
 
-  const saveAccount = (users: User[]) => {
+  const saveAccount = (users: UserProps[]) => {
     localStorage.setItem('allUsers', JSON.stringify(users));
   };
 
