@@ -3,70 +3,44 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 
+
+
+
+interface FormProps {
+  email: string;
+  password: string;
+  recados?: string []
+}
+ 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  
-  
-  const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
+  const [form, setForm] = useState<FormProps>({email:'', password:''});
 
+  
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setForm((prevForm) => ({ ...prevForm, [name]: value }));
+  }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    
-  };
 
   return (
     <>
     <div>
       <Typography variant='h4' textAlign={'center'}>Login</Typography>
       <br/><br/>
-      <form onSubmit={handleSubmit}>
-          <TextField fullWidth placeholder='e-mail' type="text" value={username} onChange={(event) => setUsername(event.target.value)} />
+      <form>
+          <TextField fullWidth placeholder='e-mail' type="text" value={form.email} />
         <br/><br/>
-          <TextField fullWidth placeholder='password' type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+          <TextField fullWidth placeholder='password' type="password" value={form.password} />
         <br/><br/>
         <Link to = "/recados" style={{textDecoration:'none'}}>
-        <Button variant='contained' fullWidth type="submit">Entrar</Button>
+          <Button variant='contained' fullWidth type="submit">Entrar</Button>
         </Link>
         <br/><br/>
-        <Button variant='contained' color='success' fullWidth onClick={handleOpen}>Criar conta</Button>
+        <Link to = "/signup" style={{textDecoration:'none'}}>
+        <Button variant='contained' color='success' fullWidth>Criar conta</Button>
+        </Link>
       </form>
     </div>
-    <div>
-    
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>
-        <Typography variant='h4' textAlign={'center'}>Criar uma nova conta</Typography>
-        <br/><br/>
-        <TextField fullWidth placeholder='e-mail' type="text" value={username} onChange={(event) => setUsername(event.target.value)} />
-        <br/><br/>
-        <TextField fullWidth placeholder='password' type="password" value={username} onChange={(event) => setUsername(event.target.value)} />
-        <br/><br/>
-        <TextField fullWidth placeholder='confirm password' type="password" value={username} onChange={(event) => setUsername(event.target.value)} />
-        <br/><br/>
-        <Button variant='contained' color='success' fullWidth>Criar conta</Button>
-      </Box>
-    </Modal>
-  </div>
   </>
   );
 };
