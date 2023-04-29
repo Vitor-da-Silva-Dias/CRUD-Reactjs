@@ -1,5 +1,8 @@
+import { Button, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+
 
 interface UserProps {
   email: string;
@@ -7,7 +10,8 @@ interface UserProps {
   errands: any[];
 }
 
-const RegisterForm: React.FC = () => {
+
+const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -59,37 +63,21 @@ const RegisterForm: React.FC = () => {
   };
 
   return (
+    <div>
+    <Typography variant='h4' textAlign={'center'}>Sign Up</Typography>
+      <br/><br/>
     <form onSubmit={handleSignUp}>
-      <div>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Senha:</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="passwordConfirm">Confirmar senha:</label>
-        <input
-          type="password"
-          id="passwordConfirm"
-          value={passwordConfirm}
-          onChange={(e) => setPasswordConfirm(e.target.value)}
-        />
-      </div>
-        <button type="submit">Cadastrar</button>
+        <TextField fullWidth label='email' type='email' value={email} onChange={(e) => setEmail(e.target.value)}/>
+        <br/><br/>
+        <TextField fullWidth label='password' type='password' value={password} onChange={(e) => setPassword(e.target.value)}/>
+        <br/><br/>
+        <TextField fullWidth label='confirm password' type='password' value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)}/>
+        <br/><br/>
+        <Button type='submit' variant='contained' color='success' fullWidth>Create Account</Button>
     </form>
+    </div>
+    
   );
 };
 
-export default RegisterForm;
+export default Register;

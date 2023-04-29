@@ -4,13 +4,12 @@ import { useNavigate, Link } from 'react-router-dom';
 
 
 
-
-
 interface LoginProps {
   email: string;
   password: string;
 }
  
+
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
