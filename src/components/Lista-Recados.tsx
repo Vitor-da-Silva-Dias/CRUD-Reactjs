@@ -1,147 +1,137 @@
-import { ListItem, IconButton, ListItemAvatar, Avatar, ListItemText, Divider, Grid, Typography, TextField, Button} from "@mui/material";
-import LogoutIcon from '@mui/icons-material/Logout';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import React, {useMemo, useState} from "react";
-import Recado from "../types/Recado";
-import DialogConfirm from "./DialogConfirm";
+import React, { useState, useEffect } from "react";
+import User from "../types/User";
+import { useNavigate } from "react-router-dom";
+
 
 
 const List: React.FC = () => {
-    
 
-    const [list, setList] = useState<Recado[]>([]);
-    const [title, setTitle] = useState<string>('');
-    const [description, setDescription] = useState<string>(''); 
-    const [open, setOpen] = useState<boolean>(false);
-    const [idRemove, setIdRemove] = useState<number | undefined>();
-    
+  const props = {
+    logged: {} as User,
+    allUsers: [] as User[],
+    onLogout: () => {},
+  }
 
-    const listaProdutos = useMemo(() => {
-        return list.map(item => {
-          return (
-            <React.Fragment key={item.id}>
-              <ListItem
-                secondaryAction={
-                  <>
-                    <IconButton onClick={() => editList(item.id)} edge="end" aria-label="edit">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => openRemoveModal(item.id)} edge="end" aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
-                  </>
-                }
-              >
-                <ListItemAvatar>
-                  <Avatar>{item.title[0].toUpperCase()}</Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={item.title} secondary={item.description} />
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          );
-        });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [list]);
-    
-      const handleClose = () => {
-        setOpen(false);
-      };
-    
-      const openRemoveModal = (id: number) => {
-        setIdRemove(id);
-        setOpen(true);
-      };
-    
-      const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        setTitle(e.target.value);
-      };
-    
-      const handleChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        setDescription(e.target.value);
-      };
-    
-      const addList = () => {
-        if (title.length) {
-          const tempId = new Date().getTime();
-          setList([...list, { id: tempId, description: description, title: title, enable: true }]);
-        }
-    
-        setTitle('');
-        setDescription('');
-      };
-    
-      const editList = (id: number) => {
-        const index = list.findIndex(item => item.id === id);
-        const newTitle: any = prompt('edit titulo');
-        const newDescription: any = prompt('edit Preço');
-        const newList = [...list];
-        
-        if(newTitle === '' || newDescription === ''){
-          alert("Não se pode deixar campos em branco! Favor preencher corretamente.")
-          return list;
-        }
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const navigate = useNavigate();
 
-        if(newTitle != null || newDescription != null){
-          newList[index].title = newTitle;
-          newList[index].description = newDescription;
-        }
-        
-        setList(newList);
-      };
-    
-      const removeItems = () => {
-        const index = list.findIndex(item => item.id === idRemove);
-        if (index !== -1) {
-          setList(prevState => {
-            prevState.splice(index, 1);
-            return [...prevState];
-          });
-        }
-        setOpen(false);
-      };
-    
-      return (
-        <Grid container spacing={4}>
-          <Grid item xs={11}>
-            <Typography variant="h3">Recados</Typography>
-          </Grid>
-          <Grid item xs={1}>
-            <LogoutIcon/>
-          </Grid>
-          <Divider/>
-          <Grid item xs={5}>
-            <TextField fullWidth value={title} label="Título" onChange={e => handleChange(e)} />
-          </Grid>
-          <Grid item xs={5}>
-            <TextField
-              fullWidth
-              value={description}
-              label="Descrição"
-              onChange={e => handleChangeDescription(e)}
-            />
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="contained" onClick={addList}>
-              Cadastrar
-            </Button>
-          </Grid>
-    
-          <Grid item xs={12}>
-            {listaProdutos};
-          </Grid>
-    
-          <DialogConfirm
-            title={'Deseja excluir produto?'}
-            subTitle={title}
-            openDialog={open}
-            actionConfirm={removeItems}
-            actionCancel={handleClose}
-          />
-        </Grid>
-      );
+  useEffect(() => {
+    if(!props.logged){
+      navigate('/');
+    }
+  }, [props.logged, navigate]);
+
+  function addErrand() {
+    if (!props.logged) {
+      return;
+    }
+  
+    const newErrand = {
+      title,
+      description
     };
-    
-    export default List;
-    
+  
+    if (!props.logged.errands) {
+      props.logged.errands = [];
+    }
+  
+    props.logged.errands.push(newErrand);
+  
+    setTitle('');
+    setDescription('');
+    saveData();
+    renderTable();
+  }
+  
+
+  function deleteErrand(index: number) {
+    props.logged.errands.splice(index, 1);
+    saveData();
+    renderTable();
+  }
+
+  function editErrand(index: number) {
+    const newTitle = prompt("Informe o novo título: ");
+
+    if (newTitle !== null) {
+      props.logged.errands[index].title = newTitle;
+    }
+
+    const newDescription = prompt("Informe a nova descrição: ");
+
+    if (newDescription !== null) {
+      props.logged.errands[index].description = newDescription;
+    }
+
+    saveData();
+    renderTable();
+  }
+
+  function saveData() {
+    sessionStorage.setItem("logged", JSON.stringify(props.logged));
+
+    const findUser = props.allUsers.findIndex((user) => user.email === props.logged.email);
+
+    props.allUsers[findUser] = props.logged;
+
+    localStorage.setItem("allUsers", JSON.stringify(props.allUsers));
+  }
+
+  const renderTable = () => {
+    return (
+      <div>
+        <h1>Tabela de Tarefas</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Título</th>
+              <th>Descrição</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {props.logged.errands.map((value, index) => (
+              <tr key={index}>
+                <td>{index + 1}</td>
+                <td>{value.title}</td>
+                <td>{value.description}</td>
+                <td>
+                  <button className="botao-apagar" onClick={() => deleteErrand(index)}>
+                    Apagar
+                  </button>
+                  <button className="botao-editar" onClick={() => editErrand(index)}>
+                    Editar
+                  </button>
+                </td>
+              </tr>
+            ))}
+            
+          </tbody>
+        </table>
+        
+      </div>
+    );
+
+  }
+return (
+  <>
+    <div>
+    <button onClick={() => props.onLogout()}>Logout</button>
+  </div>
+  <div>
+    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+            
+    <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
+             
+    <button onClick={() => addErrand()}>Adicionar</button>
+              
+    </div>
+  </>
+  
+)
+  
+};
+
+export default List;

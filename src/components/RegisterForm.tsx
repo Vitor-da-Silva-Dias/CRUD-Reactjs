@@ -1,14 +1,8 @@
 import { Button, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import User from '../types/User';
 
-
-
-interface UserProps {
-  email: string;
-  password: string;
-  errands: any[];
-}
 
 
 const Register: React.FC = () => {
@@ -17,7 +11,7 @@ const Register: React.FC = () => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const navigate = useNavigate();
 
-  const allUsers: UserProps[] = JSON.parse(localStorage.getItem('allUsers') ?? '[]');
+  const allUsers: User[] = JSON.parse(localStorage.getItem('allUsers') ?? '[]');
 
   const handleSignUp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +37,7 @@ const Register: React.FC = () => {
       return;
     }
 
-    const newUser: UserProps = {
+    const newUser: User = {
       email,
       password,
       errands: [],
@@ -58,7 +52,7 @@ const Register: React.FC = () => {
     navigate ('/');
   };
 
-  const saveAccount = (users: UserProps[]) => {
+  const saveAccount = (users: User[]) => {
     localStorage.setItem('allUsers', JSON.stringify(users));
   };
 

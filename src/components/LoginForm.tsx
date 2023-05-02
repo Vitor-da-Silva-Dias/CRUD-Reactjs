@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
+import User from '../types/User';
 
-
-
-interface LoginProps {
-  email: string;
-  password: string;
-}
  
 
 const Login: React.FC = () => {
@@ -15,7 +10,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const allUsers: LoginProps[] = JSON.parse(localStorage.getItem('allUsers') ?? '[]');
+  const allUsers: User[] = JSON.parse(localStorage.getItem('allUsers') ?? '[]');
 
   function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
