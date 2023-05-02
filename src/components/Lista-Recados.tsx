@@ -6,24 +6,19 @@ import { useNavigate } from "react-router-dom";
 
 const List: React.FC = () => {
 
-  const props = {
-    logged: {} as User,
-    allUsers: [] as User[],
-    onLogout: () => {},
-  }
-
+  const [logged, setLogged] = useState<User | null>(() => JSON.parse(sessionStorage.getItem("logged") ?? ''));
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(!props.logged){
+    if(!logged){
       navigate('/');
     }
-  }, [props.logged, navigate]);
+  }, [logged, navigate]);
 
   function addErrand() {
-    if (!props.logged) {
+    if (!logged) {
       return;
     }
   
@@ -31,107 +26,117 @@ const List: React.FC = () => {
       title,
       description
     };
-  
-    if (!props.logged.errands) {
-      props.logged.errands = [];
-    }
-  
-    props.logged.errands.push(newErrand);
-  
-    setTitle('');
-    setDescription('');
-    saveData();
-    renderTable();
+    
+    const updatedUser = {
+      ...logged,
+      errands: [...logged.errands, newErrand],
+    };
+
+    setLogged(updatedUser);
+    saveData(updatedUser);
+    setTitle("");
+    setDescription("");
   }
-  
+    
 
   function deleteErrand(index: number) {
-    props.logged.errands.splice(index, 1);
-    saveData();
-    renderTable();
+    if (!logged) return;
+
+    const updatedUser = {
+      ...logged,
+      errands: logged.errands.filter((_, i) => i !== index),
+    };
+
+    setLogged(updatedUser);
+    saveData(updatedUser);
   }
+  
 
   function editErrand(index: number) {
-    const newTitle = prompt("Informe o novo título: ");
+    if (!logged) return;
+    
 
-    if (newTitle !== null) {
-      props.logged.errands[index].title = newTitle;
+    const newTitle = prompt("Informe a nova descrição:");
+    
+
+    const newDescription = prompt("Informe o novo detalhamento:");
+    
+
+    const updatedUser = {
+      ...logged,
+      errands: logged.errands.map((errand, i) =>
+        i === index ? { title: newTitle, description: newDescription } : errand
+      ),
+    };
+
+    setLogged(updatedUser);
+    saveData(updatedUser);
+  }
+
+  function saveData(user: User) {
+    const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
+    const findUser = allUsers.findIndex((u: User) => u.email === user.email);
+
+    if (findUser !== -1) {
+      allUsers[findUser] = user;
+    } else {
+      allUsers.push(user);
     }
 
-    const newDescription = prompt("Informe a nova descrição: ");
-
-    if (newDescription !== null) {
-      props.logged.errands[index].description = newDescription;
-    }
-
-    saveData();
-    renderTable();
+    localStorage.setItem("allUsers", JSON.stringify(allUsers));
   }
 
-  function saveData() {
-    sessionStorage.setItem("logged", JSON.stringify(props.logged));
-
-    const findUser = props.allUsers.findIndex((user) => user.email === props.logged.email);
-
-    props.allUsers[findUser] = props.logged;
-
-    localStorage.setItem("allUsers", JSON.stringify(props.allUsers));
-  }
-
-  const renderTable = () => {
-    return (
-      <div>
-        <h1>Tabela de Tarefas</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Título</th>
-              <th>Descrição</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {props.logged.errands.map((value, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{value.title}</td>
-                <td>{value.description}</td>
-                <td>
-                  <button className="botao-apagar" onClick={() => deleteErrand(index)}>
-                    Apagar
-                  </button>
-                  <button className="botao-editar" onClick={() => editErrand(index)}>
-                    Editar
-                  </button>
-                </td>
-              </tr>
-            ))}
-            
-          </tbody>
-        </table>
-        
-      </div>
-    );
-
-  }
-return (
+  return (
   <>
     <div>
-    <button onClick={() => props.onLogout()}>Logout</button>
-  </div>
-  <div>
-    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-            
-    <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
-             
-    <button onClick={() => addErrand()}>Adicionar</button>
-              
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        addErrand();
+      }}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Descrição"
+        />
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Detalhamento"
+        />
+        <button type="submit">Salvar</button>
+      </form>
     </div>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Descrição</th>
+            <th>Detalhamento</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {logged?.errands.map((errand, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{errand.title}</td>
+              <td>{errand.description}</td>
+              <td>
+                <button onClick={() => deleteErrand(index)}>Apagar</button>
+                <button onClick={() => editErrand(index)}>Editar</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>  
+    
   </>
-  
-)
-  
-};
+      
+    )
+}
 
 export default List;
