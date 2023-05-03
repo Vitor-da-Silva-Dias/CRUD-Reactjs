@@ -1,6 +1,6 @@
 type Errand = {
-    title: string | null,
-    description: string | null,
+    title: string,
+    description: string,
 }
 
 export default Errand;

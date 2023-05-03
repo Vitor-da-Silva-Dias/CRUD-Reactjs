@@ -6,16 +6,19 @@ import { useNavigate } from "react-router-dom";
 
 const List: React.FC = () => {
 
-  const [logged, setLogged] = useState<User | null>(() => JSON.parse(sessionStorage.getItem("logged") ?? ''));
+  const [logged, setLogged] = useState<User | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(!logged){
-      navigate('/');
+    const sessionLogged = sessionStorage.getItem("logged");
+    if (sessionLogged) {
+      setLogged(JSON.parse(sessionLogged));
+    } else {
+      navigate("/");
     }
-  }, [logged, navigate]);
+  }, [navigate]);
 
   function addErrand() {
     if (!logged) {
@@ -32,6 +35,8 @@ const List: React.FC = () => {
       errands: [...logged.errands, newErrand],
     };
 
+    logged.errands.push(newErrand);
+    
     setLogged(updatedUser);
     saveData(updatedUser);
     setTitle("");
@@ -47,6 +52,8 @@ const List: React.FC = () => {
       errands: logged.errands.filter((_, i) => i !== index),
     };
 
+    logged.errands.splice(index, 1);
+
     setLogged(updatedUser);
     saveData(updatedUser);
   }
@@ -55,13 +62,10 @@ const List: React.FC = () => {
   function editErrand(index: number) {
     if (!logged) return;
     
+    const newTitle: string= prompt("Informe o novo título: ") ?? '';
 
-    const newTitle = prompt("Informe a nova descrição:");
+    const newDescription: string = prompt("Informe a nova descrição:") ?? '';
     
-
-    const newDescription = prompt("Informe o novo detalhamento:");
-    
-
     const updatedUser = {
       ...logged,
       errands: logged.errands.map((errand, i) =>
@@ -69,13 +73,19 @@ const List: React.FC = () => {
       ),
     };
 
+    logged.errands[index].title = newTitle;
+
+    logged.errands[index].description = newDescription;
+
     setLogged(updatedUser);
     saveData(updatedUser);
   }
 
   function saveData(user: User) {
+    
     const allUsers = JSON.parse(localStorage.getItem("allUsers") || "[]");
     const findUser = allUsers.findIndex((u: User) => u.email === user.email);
+    
 
     if (findUser !== -1) {
       allUsers[findUser] = user;
@@ -83,8 +93,14 @@ const List: React.FC = () => {
       allUsers.push(user);
     }
 
-    localStorage.setItem("allUsers", JSON.stringify(allUsers));
+    localStorage.setItem('allUsers', JSON.stringify(allUsers));
+    
+    sessionStorage.setItem('logged', JSON.stringify(logged));
+ 
+
   }
+
+  
 
   return (
   <>
@@ -108,8 +124,8 @@ const List: React.FC = () => {
         <button type="submit">Salvar</button>
       </form>
     </div>
-    <div>
-      <table>
+  <div>
+  <table>
         <thead>
           <tr>
             <th>#</th>
@@ -132,8 +148,7 @@ const List: React.FC = () => {
           ))}
         </tbody>
       </table>
-    </div>  
-    
+  </div>
   </>
       
     )
