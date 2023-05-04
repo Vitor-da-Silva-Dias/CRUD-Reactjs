@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import User from "../types/User";
 import { useNavigate } from "react-router-dom";
+import { Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 
 
@@ -109,52 +113,61 @@ const List: React.FC = () => {
   return (
   <>
     <div>
-      <button onClick={logout}>Sair</button>
+      <IconButton onClick={logout}><LogoutIcon/></IconButton>
     </div>
-    <div>
-      <form onSubmit={(e) => {
+    <Typography sx={{textAlign:'center'}} variant="h3">Meus Recados</Typography>
+    <Grid container xs={12} justifyContent={'center'}>
+      <form style={{width: '50vw'}} onSubmit={(e) => {
         e.preventDefault();
         addErrand();
       }}>
-        <input
+        
+        <TextField
+          fullWidth
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Descrição"
+          label="Descrição"
         />
-        <input
+        <br/><br/>
+        <TextField
+          fullWidth
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Detalhamento"
+          label="Detalhamento"
         />
-        <button type="submit">Salvar</button>
+        <br/><br/>
+        <Button variant="contained" type="submit">Salvar</Button>
       </form>
-    </div>
+    </Grid>
+    <br/><br/>
   <div>
-  <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Descrição</th>
-            <th>Detalhamento</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
+  <TableContainer component={Paper} sx={{backgroundColor:'lightblue'}}>
+  <Table aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell align='center'><strong>#</strong></TableCell>
+            <TableCell align='center'><strong>TÍTULO</strong></TableCell>
+            <TableCell align='center'><strong>DESCRIÇÃO</strong></TableCell>
+            <TableCell align='center'><strong>AÇÕES</strong></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {logged?.errands.map((errand, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{errand.title}</td>
-              <td>{errand.description}</td>
-              <td>
-                <button onClick={() => deleteErrand(index)}>Apagar</button>
-                <button onClick={() => editErrand(index)}>Editar</button>
-              </td>
-            </tr>
+            <TableRow key={index}>
+              <TableCell align='center'>{index + 1}</TableCell>
+              <TableCell align='center'>{errand.title}</TableCell>
+              <TableCell align='center'>{errand.description}</TableCell>
+              <TableCell align='center'>
+                <IconButton onClick={() => deleteErrand(index)}><DeleteIcon/></IconButton>
+                <IconButton onClick={() => editErrand(index)}><EditIcon/></IconButton>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+        </Table>
+      </TableContainer>
   </div>
   </>
       

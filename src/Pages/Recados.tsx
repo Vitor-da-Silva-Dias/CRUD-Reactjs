@@ -7,7 +7,7 @@ interface RecadosProps {
 
 const Recados: React.FC<RecadosProps> = ({component: Component}) => {
     return(
-        <Grid container>
+        <Grid container width={'100vw'} justifyContent={'center'}>
             <Grid item xs={12}>
                 <Component/>
             </Grid>
