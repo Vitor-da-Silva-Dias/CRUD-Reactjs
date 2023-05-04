@@ -100,10 +100,17 @@ const List: React.FC = () => {
 
   }
 
-  
+  function logout () {
+    sessionStorage.removeItem('logged');
+
+    navigate('/');
+  }
 
   return (
   <>
+    <div>
+      <button onClick={logout}>Sair</button>
+    </div>
     <div>
       <form onSubmit={(e) => {
         e.preventDefault();
