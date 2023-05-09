@@ -1,5 +1,6 @@
 import React from "react";
 import AppRoutes from "./routes/AppRoutes";
+import GlobalStyled from "./config/GlobalStyled";
 
 
 
@@ -8,6 +9,7 @@ import AppRoutes from "./routes/AppRoutes";
 function App() {
   return (
     <>
+      <GlobalStyled/>
       <AppRoutes/>
     </>
   );

@@ -66,10 +66,27 @@ const List: React.FC = () => {
   function editErrand(index: number) {
     if (!logged) return;
     
-    const newTitle: string= prompt("Informe o novo título: ") ?? '';
+    let newTitle = logged.errands[index].title;
 
-    const newDescription: string = prompt("Informe a nova descrição:") ?? '';
+    const editTitle = window.confirm('Editar o título?');
+
+    if(editTitle){
+      newTitle = prompt('Informe o novo título') ?? '';
+
+      logged.errands[index].title = newTitle;
+    }
     
+    let newDescription = logged.errands[index].description;
+
+    const editDescription = window.confirm('Editar a descrição');
+
+
+    if(editDescription){
+      newDescription = prompt('Informe a nova descrição:') ?? '';
+
+      logged.errands[index].description = newDescription;
+    }
+
     const updatedUser = {
       ...logged,
       errands: logged.errands.map((errand, i) =>
@@ -77,9 +94,6 @@ const List: React.FC = () => {
       ),
     };
 
-    logged.errands[index].title = newTitle;
-
-    logged.errands[index].description = newDescription;
 
     setLogged(updatedUser);
     saveData(updatedUser);
@@ -116,7 +130,8 @@ const List: React.FC = () => {
       <IconButton onClick={logout}><LogoutIcon/></IconButton>
     </div>
     <Typography sx={{textAlign:'center'}} variant="h3">Meus Recados</Typography>
-    <Grid container xs={12} justifyContent={'center'}>
+    <Grid container justifyContent={'center'}>
+      <Grid item>
       <form style={{width: '50vw'}} onSubmit={(e) => {
         e.preventDefault();
         addErrand();
@@ -127,7 +142,7 @@ const List: React.FC = () => {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          label="Descrição"
+          label="Título"
         />
         <br/><br/>
         <TextField
@@ -135,11 +150,12 @@ const List: React.FC = () => {
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          label="Detalhamento"
+          label="Descrição"
         />
         <br/><br/>
-        <Button variant="contained" type="submit">Salvar</Button>
+          <Button sx={{width: '50%', marginLeft:'25%'}} variant="contained" type="submit">Salvar</Button>
       </form>
+      </Grid>
     </Grid>
     <br/><br/>
   <div>
