@@ -15,7 +15,7 @@ const Register: React.FC = () => {
     e.preventDefault();
   
     if (password !== passwordConfirm) {
-      alert('As senhas digitadas são diferentes.');
+      alert(`Passwords don't match`);
       return;
     }
   
