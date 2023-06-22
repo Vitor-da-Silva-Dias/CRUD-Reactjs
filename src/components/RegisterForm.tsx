@@ -5,6 +5,7 @@ import axios from 'axios';
 import User from '../types/User';
 
 const Register: React.FC = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -12,42 +13,45 @@ const Register: React.FC = () => {
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (email.length < 6) {
-      alert('Preencha o campo com um e-mail válido.');
-      return;
-    }
-
-    if (password.length < 5) {
-      alert('Crie uma senha com no mínimo 5 dígitos.');
-      return;
-    }
-
+  
     if (password !== passwordConfirm) {
       alert('As senhas digitadas são diferentes.');
       return;
     }
-
+  
+    const newUser: User = {
+      name,
+      email,
+      password,
+      errands: [],
+    };
+  
     try {
-      const newUser: User = {
-        email,
-        password,
-        errands: [],
-      };
-
-      const response = await axios.post(`http://localhost:3333/users`, newUser);
-
-      if (response.status === 201) {
-        alert('Conta criada com sucesso.');
+      const response = await axios.post('http://localhost:3333/users', newUser);
+  
+      const { ok, message, errors } = response.data;
+  
+      if (ok) {
+        alert(message);
         navigate('/');
       } else {
-        alert('Falha ao criar a conta. Por favor, tente novamente.');
+        if (errors && errors.length > 0) {
+          const errorMessages = errors.join('\n');
+          alert(errorMessages);
+        } else {
+          alert(message);
+        }
       }
-    } catch (error) {
-      console.error('Erro ao criar a conta:', error);
-      alert('Ocorreu um erro ao criar a conta. Por favor, tente novamente.');
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        console.log(error);
+        alert('There was an error creating the account');
+      }
     }
   };
+  
 
   return (
     <div>
@@ -57,6 +61,15 @@ const Register: React.FC = () => {
       <br />
       <br />
       <form onSubmit={handleSignUp}>
+      <TextField
+          fullWidth
+          label="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <br />
+        <br />
         <TextField
           fullWidth
           label="email"

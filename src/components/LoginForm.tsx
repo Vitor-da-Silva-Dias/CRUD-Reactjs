@@ -19,10 +19,11 @@ const Login: React.FC = () => {
 
       const { ok, message, data } = response.data;
 
-      if (ok) {
-        alert('Login realizado com sucesso.');
 
-        sessionStorage.setItem('token', data.token);
+      if (ok) {
+        alert(message);
+
+        sessionStorage.setItem('logged', JSON.stringify(data));
 
         navigate('/recados');
       } else {
