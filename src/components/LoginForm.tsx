@@ -17,7 +17,7 @@ const Login: React.FC = () => {
         password,
       });
 
-      const { ok, message, data } = response.data;
+      const { ok, message, data, errors } = response.data;
 
 
       if (ok) {
@@ -27,11 +27,20 @@ const Login: React.FC = () => {
 
         navigate('/recados');
       } else {
-        alert(message);
+        if (errors && errors.length > 0) {
+          const errorMessages = errors.join('\n');
+          alert(errorMessages);
+        } else {
+          alert(message);
+        }
       }
-    } catch (error) {
-      console.log(error);
-      alert('Ocorreu um erro ao fazer login.');
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        console.log(error);
+        alert('An error ocurred while logging in.');
+      }
     }
   };
 
