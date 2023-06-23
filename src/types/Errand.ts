@@ -1,5 +1,5 @@
 type Errand = {
-    errandId?:string,
+    id?:string,
     description: string,
     detail: string,
 }

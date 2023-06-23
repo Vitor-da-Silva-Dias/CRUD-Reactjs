@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import User from "../types/User";
-import Errand from "../types/Errand";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -55,15 +54,18 @@ const List: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.ok) {
+          
           const updatedUser = {
             ...logged,
             errands: [...logged.errands, data.data],
           };
-          setLogged(updatedUser); // Atualiza o usuário logado com a nova lista de recados
+          setLogged(updatedUser);
+          saveData(updatedUser);
           setDescription("");
           setDetail("");
+          alert(data.message);
         } else {
-          console.error("Error:", data.message);
+          alert(data.message);
         }
       })
       .catch((error) => {
@@ -74,6 +76,9 @@ const List: React.FC = () => {
   function deleteErrand(id: string | undefined) {
     if (!logged) return;
 
+    const confirm = window.confirm("Are you sure?");
+
+    if(confirm){
     fetch(`http://localhost:3333/users/${logged.id}/errands/${id}`, {
       method: "DELETE",
     })
@@ -82,22 +87,25 @@ const List: React.FC = () => {
         if (data.ok) {
           const updatedUser = {
             ...logged,
-            errands: logged.errands.filter((errand) => errand.errandId !== id),
+            errands: logged.errands.filter((errand) => errand.id !== id),
           };
           setLogged(updatedUser);
+          saveData(updatedUser);
+          alert(data.message);
         } else {
-          console.error("Error:", data.message);
+          alert(data.message);
         }
       })
       .catch((error) => {
         console.error("Error:", error);
       });
+    }
   }
 
   function editErrand(id: string | undefined) {
     if (!logged) return;
   
-    let newDescription = logged.errands.find((errand) => errand.errandId === id)?.description || "";
+    let newDescription = logged.errands.find((errand) => errand.id === id)?.description || "";
   
     const editDescription = window.confirm("Editar o título?");
   
@@ -105,7 +113,7 @@ const List: React.FC = () => {
       newDescription = prompt("Informe o novo título") ?? "";
     }
   
-    let newDetail = logged.errands.find((errand) => errand.errandId === id)?.detail || "";
+    let newDetail = logged.errands.find((errand) => errand.id === id)?.detail || "";
   
     const editDetail = window.confirm("Editar a descrição");
   
@@ -126,18 +134,31 @@ const List: React.FC = () => {
           const updatedUser = {
             ...logged,
             errands: logged.errands.map((errand) =>
-              errand.errandId === id ? { ...errand, description: newDescription, detail: newDetail } : errand
+              errand.id === id ? { ...errand, description: newDescription, detail: newDetail } : errand
             ),
           };
           setLogged(updatedUser);
+          saveData(updatedUser);
+          alert(data.message);
         } else {
-          console.error("Error:", data.message);
+          alert(data.message);
         }
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
+
+function saveData(user: User) {
+  const storageKey = "logged";
+  const loggedData = JSON.parse(sessionStorage.getItem(storageKey) ?? '');
+  const updatedLoggedData = {
+    ...loggedData,
+    errands: user.errands || [],
+  };
+  sessionStorage.setItem(storageKey, JSON.stringify(updatedLoggedData));
+}
+
   
   function logout() {
     sessionStorage.removeItem("logged");
@@ -194,9 +215,7 @@ const List: React.FC = () => {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell align="center">
-                  <strong>#</strong>
-                </TableCell>
+                
                 <TableCell align="center">
                   <strong>TÍTULO</strong>
                 </TableCell>
@@ -210,15 +229,15 @@ const List: React.FC = () => {
             </TableHead>
             <TableBody>
               {logged?.errands?.map((errand) => (
-                <TableRow key={`errand_${errand.errandId}`}>
-                  <TableCell align="center">{errand.errandId}</TableCell>
+                <TableRow key={errand.id}>
+                  
                   <TableCell align="center">{errand.description}</TableCell>
                   <TableCell align="center">{errand.detail}</TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => deleteErrand(errand.errandId)}>
+                    <IconButton onClick={() => deleteErrand(errand.id)}>
                       <DeleteIcon />
                     </IconButton>
-                    <IconButton onClick={() => editErrand(errand.errandId)}>
+                    <IconButton onClick={() => editErrand(errand.id)}>
                       <EditIcon />
                     </IconButton>
                   </TableCell>
