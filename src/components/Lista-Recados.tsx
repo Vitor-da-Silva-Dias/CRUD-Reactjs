@@ -18,6 +18,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 const List: React.FC = () => {
   const [logged, setLogged] = useState<User | null>(null);
@@ -149,6 +150,30 @@ const List: React.FC = () => {
       });
   }
 
+  function archiveErrand(id: string| undefined) {
+    if (!logged) return;
+
+    fetch(`http://localhost:3333/users/${logged.id}/errands/${id}/archive`, {
+      method: 'POST',
+    })
+      .then((response) => response.json()) 
+      .then((data) => {
+        if (data.ok) {
+          console.log('Recado arquivado com sucesso');
+          // Redirecionar para a página de recados arquivados
+          window.location.href = '/archived-errands.html';
+        } else {
+          console.error('Erro ao arquivar recado');
+          alert('Erro ao arquivar recado');
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao arquivar recado', error);
+        alert('Erro ao arquivar recado');
+      });
+  }
+  
+
 function saveData(user: User) {
   const storageKey = "logged";
   const loggedData = JSON.parse(sessionStorage.getItem(storageKey) ?? '');
@@ -239,6 +264,9 @@ function saveData(user: User) {
                     </IconButton>
                     <IconButton onClick={() => editErrand(errand.id)}>
                       <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => archiveErrand(errand.id)}>
+                      <ArchiveIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
