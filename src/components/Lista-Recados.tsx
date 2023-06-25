@@ -224,7 +224,7 @@ const List: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.ok) {
-          // Faça algo com os recados filtrados, como atualizar o estado para exibir na tela
+          
           console.log('Recados filtrados:', data.errands);
         } else {
           console.error('Erro ao filtrar recados');
@@ -260,14 +260,18 @@ const List: React.FC = () => {
         <IconButton onClick={logout}>
           <LogoutIcon />
         </IconButton>
+        
       </div>
+      <br/>
       <div>
       <input type="text" value={filterDescription} onChange={(e) => setFilterDescription(e.target.value)} />
+      <br/>
       <select value={filterArchived} onChange={(e) => setFilterArchived(e.target.value)}>
         <option value="">Todos</option>
         <option value="true">Arquivados</option>
         <option value="false">Desarquivados</option>
       </select>
+      <br/>
       <button onClick={() => filterErrands(filterDescription, filterArchived)}>Filtrar</button>
     </div>
       <Typography sx={{ textAlign: "center" }} variant="h3">
