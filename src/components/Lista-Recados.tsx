@@ -19,11 +19,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ArchiveIcon from '@mui/icons-material/Archive';
+import UnarchiveIcon from '@mui/icons-material/Archive';
 
 const List: React.FC = () => {
   const [logged, setLogged] = useState<User | null>(null);
   const [description, setDescription] = useState("");
   const [detail, setDetail] = useState("");
+  const [filterDescription, setFilterDescription] = useState("");
+  const [filterArchived, setFilterArchived] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -159,9 +162,16 @@ const List: React.FC = () => {
       .then((response) => response.json()) 
       .then((data) => {
         if (data.ok) {
-          console.log('Recado arquivado com sucesso');
-          // Redirecionar para a página de recados arquivados
-          window.location.href = '/archived-errands.html';
+          const updatedErrands = logged.errands.map((errand) => {
+            if (errand.id === id) {
+              return { ...errand, archived: true };
+            }
+            return errand;
+          });
+        
+          const updatedUser = { ...logged, errands: updatedErrands };
+          setLogged(updatedUser);
+          saveData(updatedUser);
         } else {
           console.error('Erro ao arquivar recado');
           alert('Erro ao arquivar recado');
@@ -173,15 +183,69 @@ const List: React.FC = () => {
       });
   }
   
+  function unarchiveErrand(id: string | undefined) {
+    if (!logged) return;
+  
+    fetch(`http://localhost:3333/users/${logged.id}/errands/${id}/unarchive`, {
+      method: 'POST',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.ok) {
+          const updatedErrands = logged.errands.map((errand) => {
+            if (errand.id === id) {
+              return { ...errand, archived: false };
+            }
+            return errand;
+          });
+        
+          const updatedUser = { ...logged, errands: updatedErrands };
+          setLogged(updatedUser);
+          saveData(updatedUser);
+        } else {
+          console.error('Erro ao desarquivar recado');
+          alert('Erro ao desarquivar recado');
+        }
+      })
+      .catch((error) => {
+        console.error('Erro ao desarquivar recado', error);
+        alert('Erro ao desarquivar recado');
+      });
+  }
 
-function saveData(user: User) {
-  const storageKey = "logged";
-  const loggedData = JSON.parse(sessionStorage.getItem(storageKey) ?? '');
-  const updatedLoggedData = {
-    ...loggedData,
-    errands: user.errands || [],
-  };
-  sessionStorage.setItem(storageKey, JSON.stringify(updatedLoggedData));
+  function filterErrands(description: string, archived: string) {
+    if (!logged) return;
+
+    
+
+    fetch(`http://localhost:3333/users/${logged.id}/errands/filter?title=${description}&archived=${archived}`, {
+      method: 'GET'
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.ok) {
+          // Faça algo com os recados filtrados, como atualizar o estado para exibir na tela
+          console.log('Recados filtrados:', data.errands);
+        } else {
+          console.error('Erro ao filtrar recados');
+          alert('Erro ao filtrar recados');
+        }
+      })
+      .catch((error) => {
+        console.error('Erro ao filtrar recados', error);
+        alert('Erro ao filtrar recados');
+      });
+  }
+  
+
+  function saveData(user: User) {
+    const storageKey = "logged";
+    const loggedData = JSON.parse(sessionStorage.getItem(storageKey) ?? '');
+    const updatedLoggedData = {
+      ...loggedData,
+      errands: user.errands || [],
+    };
+    sessionStorage.setItem(storageKey, JSON.stringify(updatedLoggedData));
 }
 
   
@@ -197,6 +261,15 @@ function saveData(user: User) {
           <LogoutIcon />
         </IconButton>
       </div>
+      <div>
+      <input type="text" value={filterDescription} onChange={(e) => setFilterDescription(e.target.value)} />
+      <select value={filterArchived} onChange={(e) => setFilterArchived(e.target.value)}>
+        <option value="">Todos</option>
+        <option value="true">Arquivados</option>
+        <option value="false">Desarquivados</option>
+      </select>
+      <button onClick={() => filterErrands(filterDescription, filterArchived)}>Filtrar</button>
+    </div>
       <Typography sx={{ textAlign: "center" }} variant="h3">
         Meus Recados
       </Typography>
@@ -237,43 +310,62 @@ function saveData(user: User) {
       <br />
       <div>
         <TableContainer component={Paper} sx={{ backgroundColor: "lightblue" }}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                
-                <TableCell align="center">
-                  <strong>TÍTULO</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>DESCRIÇÃO</strong>
-                </TableCell>
-                <TableCell align="center">
-                  <strong>AÇÕES</strong>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {logged?.errands?.map((errand) => (
-                <TableRow key={errand.id}>
-                  
-                  <TableCell align="center">{errand.description}</TableCell>
-                  <TableCell align="center">{errand.detail}</TableCell>
-                  <TableCell align="center">
-                    <IconButton onClick={() => deleteErrand(errand.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                    <IconButton onClick={() => editErrand(errand.id)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton onClick={() => archiveErrand(errand.id)}>
-                      <ArchiveIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+  <Table aria-label="simple table">
+    <TableHead>
+      <TableRow>
+        <TableCell align="center">
+          <strong>TÍTULO</strong>
+        </TableCell>
+        <TableCell align="center">
+          <strong>DESCRIÇÃO</strong>
+        </TableCell>
+        <TableCell align="center">
+          <strong>AÇÕES</strong>
+        </TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {logged?.errands.map((errand) => {
+        if (errand.archived) {
+          return (
+            <TableRow key={errand.id}>
+              <TableCell style={{ display: "none" }} align="center">
+                {errand.description}
+              </TableCell>
+              <TableCell style={{ display: "none" }} align="center">
+                {errand.detail}
+              </TableCell>
+              <TableCell align="center">
+                <IconButton onClick={() => unarchiveErrand(errand.id)}>
+                  <UnarchiveIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          );
+        }
+
+        return (
+          <TableRow key={errand.id}>
+            <TableCell align="center">{errand.description}</TableCell>
+            <TableCell align="center">{errand.detail}</TableCell>
+            <TableCell align="center">
+              <IconButton onClick={() => deleteErrand(errand.id)}>
+                <DeleteIcon />
+              </IconButton>
+              <IconButton onClick={() => editErrand(errand.id)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton onClick={() => archiveErrand(errand.id)}>
+                <ArchiveIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        );
+      })}
+    </TableBody>
+  </Table>
+</TableContainer>
+
       </div>
     </>
   );
