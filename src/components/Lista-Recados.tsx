@@ -48,7 +48,7 @@ const List: React.FC = () => {
       detail,
     };
   
-    fetch(`http://localhost:3333/users/${logged.id}/errands`, {
+    fetch(`https://api-crud-users-errands.onrender.com/users/${logged.id}/errands`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +83,7 @@ const List: React.FC = () => {
     const confirm = window.confirm("Are you sure?");
 
     if(confirm){
-    fetch(`http://localhost:3333/users/${logged.id}/errands/${id}`, {
+    fetch(`https://api-crud-users-errands.onrender.com/users/${logged.id}/errands/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -125,7 +125,7 @@ const List: React.FC = () => {
       newDetail = prompt("Informe a nova descrição:") ?? "";
     }
   
-    fetch(`http://localhost:3333/users/${logged.id}/errands/${id}`, {
+    fetch(`https://api-crud-users-errands.onrender.com/users/${logged.id}/errands/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -156,7 +156,7 @@ const List: React.FC = () => {
   function archiveErrand(id: string| undefined) {
     if (!logged) return;
 
-    fetch(`http://localhost:3333/users/${logged.id}/errands/${id}/archive`, {
+    fetch(`https://api-crud-users-errands.onrender.com/users/${logged.id}/errands/${id}/archive`, {
       method: 'POST',
     })
       .then((response) => response.json()) 
@@ -186,7 +186,7 @@ const List: React.FC = () => {
   function unarchiveErrand(id: string | undefined) {
     if (!logged) return;
   
-    fetch(`http://localhost:3333/users/${logged.id}/errands/${id}/unarchive`, {
+    fetch(`https://api-crud-users-errands.onrender.com/users/${logged.id}/errands/${id}/unarchive`, {
       method: 'POST',
     })
       .then((response) => response.json())
@@ -218,7 +218,7 @@ const List: React.FC = () => {
 
     
 
-    fetch(`http://localhost:3333/users/${logged.id}/errands/filter?title=${description}&archived=${archived}`, {
+    fetch(`https://api-crud-users-errands.onrender.com/users/${logged.id}/errands/filter?title=${description}&archived=${archived}`, {
       method: 'GET'
     })
       .then((response) => response.json())
@@ -329,7 +329,7 @@ const List: React.FC = () => {
       </TableRow>
     </TableHead>
     <TableBody>
-      {logged?.errands.map((errand) => {
+      {logged?.errands?.map((errand) => {
         if (errand.archived) {
           return (
             <TableRow key={errand.id}>

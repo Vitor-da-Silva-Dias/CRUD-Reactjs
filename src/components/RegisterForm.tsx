@@ -27,7 +27,7 @@ const Register: React.FC = () => {
     };
   
     try {
-      const response = await axios.post('http://localhost:3333/users', newUser);
+      const response = await axios.post('https://api-crud-users-errands.onrender.com/users', newUser);
   
       const { ok, message, errors } = response.data;
   

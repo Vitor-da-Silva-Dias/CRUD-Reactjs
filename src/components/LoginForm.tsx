@@ -12,7 +12,7 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3333/users/login', {
+      const response = await axios.post('https://api-crud-users-errands.onrender.com/users/login', {
         email,
         password,
       });
